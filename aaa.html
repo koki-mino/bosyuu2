@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中学生ボランティアアプリ　テストサイト</title>
+    <!-- Tailwind CSS CDNを読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwindの設定をカスタマイズ
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Interフォントを適用 */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">【テスト】中ボラ大募集！</h1>
+            <nav>
+                <button id="studentViewBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">中学生向けページ</button>
+                <button id="organizerLoginBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300 ml-4">主催者ログイン</button>
+                <button id="organizerLogoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300 ml-4">ログアウト</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+
+        <!-- 中学生向けページ (デフォルトで表示) -->
+        <div id="studentView" class="view">
+            <h2 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">募集中のボランティア一覧</h2>
+            <div id="eventListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- イベントカードがここに動的に挿入されます -->
+            </div>
+            <p id="noEventsMessageStudent" class="hidden text-center text-gray-500 text-lg mt-12">現在、募集中のイベントはありません。</p>
+        </div>
+
+        <!-- 主催者ログインページ -->
+        <div id="organizerLoginView" class="hidden view">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">主催者ログイン</h2>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="organizerId" class="block text-gray-700 font-bold mb-2">ID</label>
+                        <input type="text" id="organizerId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="organizerPassword" class="block text-gray-700 font-bold mb-2">パスワード</label>
+                        <input type="password" id="organizerPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <p id="loginError" class="hidden text-red-500 text-sm mb-4">IDまたはパスワードが間違っています。</p>
+                    <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-full transition-colors duration-300">ログイン</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 主催者ページ (イベント管理) -->
+        <div id="organizerView" class="hidden view">
+            <h2 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">イベント管理</h2>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">新規イベント登録</h3>
+                <form id="eventForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="organizerName" class="block text-gray-700 font-bold mb-2">主催者名</label>
+                            <input type="text" id="organizerName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="eventName" class="block text-gray-700 font-bold mb-2">イベント名</label>
+                            <input type="text" id="eventName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="eventDate" class="block text-gray-700 font-bold mb-2">日程</label>
+                            <input type="date" id="eventDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="eventLocation" class="block text-gray-700 font-bold mb-2">場所</label>
+                            <input type="text" id="eventLocation" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="meetingTime" class="block text-gray-700 font-bold mb-2">集合時間</label>
+                            <input type="time" id="meetingTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="dissolutionTime" class="block text-gray-700 font-bold mb-2">解散時間</label>
+                            <input type="time" id="dissolutionTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="targetSchools" class="block text-gray-700 font-bold mb-2">対象の中学校</label>
+                        <input type="text" id="targetSchools" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="itemsToBring" class="block text-gray-700 font-bold mb-2">持ち物</label>
+                        <input type="text" id="itemsToBring" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="dressCode" class="block text-gray-700 font-bold mb-2">服装</label>
+                        <input type="text" id="dressCode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="otherNotes" class="block text-gray-700 font-bold mb-2">その他連絡事項</label>
+                        <textarea id="otherNotes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="recruitmentUrl" class="block text-gray-700 font-bold mb-2">募集用URL</label>
+                        <input type="url" id="recruitmentUrl" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-full transition-colors duration-300">イベントを登録</button>
+                </form>
+            </div>
+
+            <!-- 登録済みイベント一覧 -->
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">登録済みイベント</h3>
+                <div id="organizerEventListContainer" class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead>
+                            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">イベント名</th>
+                                <th class="py-3 px-6 text-left">日程</th>
+                                <th class="py-3 px-6 text-center">アクション</th>
+                            </tr>
+                        </thead>
+                        <tbody id="organizerEventList" class="text-gray-600 text-sm font-light">
+                            <!-- 登録済みイベントがここに動的に挿入されます -->
+                        </tbody>
+                    </table>
+                </div>
+                <p id="noEventsMessageOrganizer" class="hidden text-center text-gray-500 text-lg mt-4">現在、イベントは登録されていません。</p>
+            </div>
+        </div>
+
+        <!-- カスタムモーダル (確認ダイアログの代替) -->
+        <div id="customModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-80">
+                <p id="modalMessage" class="text-center text-lg font-semibold mb-4">本当に削除しますか？</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="modalConfirmBtn" class="bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-600">削除</button>
+                    <button id="modalCancelBtn" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-full hover:bg-gray-400">キャンセル</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 編集モーダル -->
+        <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white p-8 rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">イベントを編集</h3>
+                <form id="editEventForm">
+                    <input type="hidden" id="editEventId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="editOrganizerName" class="block text-gray-700 font-bold mb-2">主催者名</label>
+                            <input type="text" id="editOrganizerName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="editEventName" class="block text-gray-700 font-bold mb-2">イベント名</label>
+                            <input type="text" id="editEventName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="editEventDate" class="block text-gray-700 font-bold mb-2">日程</label>
+                            <input type="date" id="editEventDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="editEventLocation" class="block text-gray-700 font-bold mb-2">場所</label>
+                            <input type="text" id="editEventLocation" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="editMeetingTime" class="block text-gray-700 font-bold mb-2">集合時間</label>
+                            <input type="time" id="editMeetingTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label for="editDissolutionTime" class="block text-gray-700 font-bold mb-2">解散時間</label>
+                            <input type="time" id="editDissolutionTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editTargetSchools" class="block text-gray-700 font-bold mb-2">対象の中学校</label>
+                        <input type="text" id="editTargetSchools" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editItemsToBring" class="block text-gray-700 font-bold mb-2">持ち物</label>
+                        <input type="text" id="editItemsToBring" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editDressCode" class="block text-gray-700 font-bold mb-2">服装</label>
+                        <input type="text" id="editDressCode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editOtherNotes" class="block text-gray-700 font-bold mb-2">その他連絡事項</label>
+                        <textarea id="editOtherNotes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="editRecruitmentUrl" class="block text-gray-700 font-bold mb-2">募集用URL</label>
+                        <input type="url" id="editRecruitmentUrl" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="closeEditModalBtn" class="bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-full hover:bg-gray-400">キャンセル</button>
+                        <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-full transition-colors duration-300">更新</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2024 ボランティアアプリ. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    // ここにGASのウェブアプリURLを貼り付けてください
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwisetZ-d0rxInvJrxuBAdYkv_9MNRAZZdsGllbTfTNftQ8rqLeeUxywJnV7-ok1rsS/exec';
+
+    // 主催者ログイン情報
+    const ORGANIZER_ID = 'ikuseikai';
+    const ORGANIZER_PASSWORD = 'ringodaisuki';
+
+    // DOM要素の取得
+    const studentView = document.getElementById('studentView');
+    const organizerLoginView = document.getElementById('organizerLoginView');
+    const organizerView = document.getElementById('organizerView');
+    const eventListContainer = document.getElementById('eventListContainer');
+    const organizerEventList = document.getElementById('organizerEventList');
+    const eventForm = document.getElementById('eventForm');
+    const loginForm = document.getElementById('loginForm');
+    const organizerLoginBtn = document.getElementById('organizerLoginBtn');
+    const organizerLogoutBtn = document.getElementById('organizerLogoutBtn');
+    const studentViewBtn = document.getElementById('studentViewBtn');
+    const noEventsMessageStudent = document.getElementById('noEventsMessageStudent');
+    const noEventsMessageOrganizer = document.getElementById('noEventsMessageOrganizer');
+    const customModal = document.getElementById('customModal');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const editModal = document.getElementById('editModal');
+    const editEventForm = document.getElementById('editEventForm');
+    const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+
+    // アプリケーションの状態管理
+    let isLoggedIn = false;
+    let eventToDeleteId = null; // 削除するイベントのIDを一時的に保持
+
+    // ビューを切り替える関数
+    function showView(viewId) {
+        document.querySelectorAll('.view').forEach(view => {
+            view.classList.add('hidden');
+        });
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    // APIを通じてデータを取得する
+    async function fetchEvents() {
+        try {
+            const response = await fetch(GAS_WEB_APP_URL);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Failed to fetch events:', error);
+            return [];
+        }
+    }
+
+    // APIを通じてデータを送信する
+    async function postEventData(payload) {
+        try {
+            const response = await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to post data:', error);
+            return { status: 'error' };
+        }
+    }
+
+    // 中学生向けページにイベントリストをレンダリングする
+    async function renderStudentEvents() {
+        const events = await fetchEvents();
+        eventListContainer.innerHTML = '';
+        if (events.length === 0) {
+            noEventsMessageStudent.classList.remove('hidden');
+        } else {
+            noEventsMessageStudent.classList.add('hidden');
+            events.forEach(event => {
+                const eventCard = `
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">${event.eventName || 'イベント名なし'}</h3>
+                        <p class="text-gray-600 mb-1">📅 ${event.eventDate || '日程未定'}</p>
+                        <p class="text-gray-600 mb-4">📍 ${event.eventLocation || '場所未定'}</p>
+                        <p class="text-gray-500 mb-4 text-sm">${event.otherNotes ? event.otherNotes.substring(0, 100) + '...' : ''}</p>
+                        <button onclick="showEventDetails('${event.id}')" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-full mr-2 hover:bg-gray-300">詳細を見る</button>
+                        ${event.recruitmentUrl ? `<a href="${event.recruitmentUrl}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full inline-block">申し込む</a>` : ''}
+                    </div>
+                `;
+                eventListContainer.innerHTML += eventCard;
+            });
+        }
+    }
+
+    // イベント詳細をモーダルで表示する
+    async function showEventDetails(id) {
+        const events = await fetchEvents();
+        const event = events.find(e => e.id === id);
+        if (!event) return;
+        const detailsHtml = `
+            <div id="tempModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div class="bg-white p-8 rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+                    <button onclick="document.getElementById('tempModal').remove()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                    <h3 class="text-3xl font-extrabold text-gray-800 mb-4">${event.eventName || 'イベント名なし'}</h3>
+                    <p class="text-gray-600 mb-2"><strong>主催者:</strong> ${event.organizerName || '主催者名なし'}</p>
+                    <p class="text-gray-600 mb-2"><strong>日程:</strong> ${event.eventDate || '日程未定'}</p>
+                    <p class="text-gray-600 mb-2"><strong>場所:</strong> ${event.eventLocation || '未定'}</p>
+                    <p class="text-gray-600 mb-2"><strong>集合時間:</strong> ${event.meetingTime || '未定'}</p>
+                    <p class="text-gray-600 mb-2"><strong>解散時間:</strong> ${event.dissolutionTime || '未定'}</p>
+                    <p class="text-gray-600 mb-2"><strong>対象の中学校:</strong> ${event.targetSchools || 'すべての学校'}</p>
+                    <p class="text-gray-600 mb-2"><strong>持ち物:</strong> ${event.itemsToBring || '特になし'}</p>
+                    <p class="text-gray-600 mb-2"><strong>服装:</strong> ${event.dressCode || '自由'}</p>
+                    <p class="text-gray-600 mb-4"><strong>その他連絡事項:</strong> ${event.otherNotes || '特になし'}</p>
+                    ${event.recruitmentUrl ? `<a href="${event.recruitmentUrl}" target="_blank" class="w-full text-center block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-full transition-colors duration-300">申し込む</a>` : ''}
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', detailsHtml);
+    }
+
+    // 主催者向けページにイベントリストをレンダリングする
+    async function renderOrganizerEvents() {
+        const events = await fetchEvents();
+        organizerEventList.innerHTML = '';
+        if (events.length === 0) {
+            noEventsMessageOrganizer.classList.remove('hidden');
+        } else {
+            noEventsMessageOrganizer.classList.add('hidden');
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200 hover:bg-gray-100';
+                row.innerHTML = `
+                    <td class="py-3 px-6 text-left whitespace-nowrap">${event.eventName || 'イベント名なし'}</td>
+                    <td class="py-3 px-6 text-left">${event.eventDate || '日程未定'}</td>
+                    <td class="py-3 px-6 text-center">
+                        <button onclick="editEvent('${event.id}')" class="bg-indigo-500 text-white py-1 px-3 rounded-full text-xs hover:bg-indigo-600 mr-2">編集</button>
+                        <button onclick="showDeleteModal('${event.id}')" class="bg-red-500 text-white py-1 px-3 rounded-full text-xs hover:bg-red-600">削除</button>
+                    </td>
+                `;
+                organizerEventList.appendChild(row);
+            });
+        }
+    }
+
+    // イベント登録フォームの送信処理
+    eventForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newEvent = {
+            organizerName: document.getElementById('organizerName').value,
+            eventName: document.getElementById('eventName').value,
+            eventDate: document.getElementById('eventDate').value,
+            eventLocation: document.getElementById('eventLocation').value,
+            meetingTime: document.getElementById('meetingTime').value,
+            dissolutionTime: document.getElementById('dissolutionTime').value,
+            targetSchools: document.getElementById('targetSchools').value,
+            itemsToBring: document.getElementById('itemsToBring').value,
+            dressCode: document.getElementById('dressCode').value,
+            otherNotes: document.getElementById('otherNotes').value,
+            recruitmentUrl: document.getElementById('recruitmentUrl').value,
+        };
+        const result = await postEventData({ action: 'add', event: newEvent });
+        if (result.status === 'success') {
+            eventForm.reset();
+            renderOrganizerEvents();
+            renderStudentEvents();
+        } else {
+            alert('イベントの登録に失敗しました。');
+        }
+    });
+
+    // ログインフォームの送信処理
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const id = document.getElementById('organizerId').value;
+        const password = document.getElementById('organizerPassword').value;
+        const loginError = document.getElementById('loginError');
+        if (id === ORGANIZER_ID && password === ORGANIZER_PASSWORD) {
+            isLoggedIn = true;
+            loginError.classList.add('hidden');
+            showView('organizerView');
+            organizerLoginBtn.classList.add('hidden');
+            organizerLogoutBtn.classList.remove('hidden');
+            renderOrganizerEvents();
+        } else {
+            loginError.classList.remove('hidden');
+        }
+    });
+
+    // ログアウト処理
+    organizerLogoutBtn.addEventListener('click', () => {
+        isLoggedIn = false;
+        showView('studentView');
+        organizerLoginBtn.classList.remove('hidden');
+        organizerLogoutBtn.classList.add('hidden');
+        renderStudentEvents();
+    });
+
+    // ビュー切り替えボタンのイベントリスナー
+    studentViewBtn.addEventListener('click', () => {
+        showView('studentView');
+        renderStudentEvents();
+    });
+
+    organizerLoginBtn.addEventListener('click', () => {
+        showView('organizerLoginView');
+    });
+
+    // 削除確認モーダルを表示する
+    function showDeleteModal(id) {
+        eventToDeleteId = id;
+        customModal.classList.remove('hidden');
+    }
+
+    // 削除を実行する
+    modalConfirmBtn.addEventListener('click', async () => {
+        const result = await postEventData({ action: 'delete', id: eventToDeleteId });
+        if (result.status === 'success') {
+            renderOrganizerEvents();
+            renderStudentEvents();
+        } else {
+            alert('イベントの削除に失敗しました。');
+        }
+        customModal.classList.add('hidden');
+    });
+
+    // 削除をキャンセルする
+    modalCancelBtn.addEventListener('click', () => {
+        customModal.classList.add('hidden');
+    });
+
+    // 編集フォームにデータを読み込む
+    async function editEvent(id) {
+        const events = await fetchEvents();
+        const event = events.find(e => e.id === id);
+        if (!event) return;
+
+        document.getElementById('editEventId').value = event.id;
+        document.getElementById('editOrganizerName').value = event.organizerName;
+        document.getElementById('editEventName').value = event.eventName;
+        document.getElementById('editEventDate').value = event.eventDate;
+        document.getElementById('editEventLocation').value = event.eventLocation;
+        document.getElementById('editMeetingTime').value = event.meetingTime;
+        document.getElementById('editDissolutionTime').value = event.dissolutionTime;
+        document.getElementById('editTargetSchools').value = event.targetSchools;
+        document.getElementById('editItemsToBring').value = event.itemsToBring;
+        document.getElementById('editDressCode').value = event.dressCode;
+        document.getElementById('editOtherNotes').value = event.otherNotes;
+        document.getElementById('editRecruitmentUrl').value = event.recruitmentUrl;
+
+        editModal.classList.remove('hidden');
+    }
+
+    // 編集フォームの送信処理
+    editEventForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const eventId = document.getElementById('editEventId').value;
+        const updatedEvent = {
+            id: eventId,
+            organizerName: document.getElementById('editOrganizerName').value,
+            eventName: document.getElementById('editEventName').value,
+            eventDate: document.getElementById('editEventDate').value,
+            eventLocation: document.getElementById('editEventLocation').value,
+            meetingTime: document.getElementById('editMeetingTime').value,
+            dissolutionTime: document.getElementById('editDissolutionTime').value,
+            targetSchools: document.getElementById('editTargetSchools').value,
+            itemsToBring: document.getElementById('editItemsToBring').value,
+            dressCode: document.getElementById('editDressCode').value,
+            otherNotes: document.getElementById('editOtherNotes').value,
+            recruitmentUrl: document.getElementById('editRecruitmentUrl').value,
+        };
+
+        const result = await postEventData({ action: 'update', event: updatedEvent });
+        if (result.status === 'success') {
+            renderOrganizerEvents();
+            renderStudentEvents();
+            editModal.classList.add('hidden');
+        } else {
+            alert('イベントの更新に失敗しました。');
+        }
+    });
+
+    // 編集モーダルを閉じる
+    closeEditModalBtn.addEventListener('click', () => {
+        editModal.classList.add('hidden');
+    });
+
+    // 初期化処理
+    async function initializeApp() {
+        // アプリ起動時にデータを取得して表示
+        renderStudentEvents();
+        showView('studentView');
+    }
+
+    // アプリを初期化
+    initializeApp();
+    </script>
+</body>
+</html>
+
+

@@ -3,12 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>中学生ボランティア募集</title>
+  <title>中学生ボランティア募集アプリ</title>
 
-  <!-- メインCSS -->
   <link rel="stylesheet" href="./style.css" />
 
-  <!-- CSVパース用ライブラリ（PapaParse） -->
+  <!-- PapaParse（CSV読み込み用） -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
@@ -16,88 +15,240 @@
     <div class="header-inner">
       <h1 class="site-title">中学生ボランティア募集</h1>
       <p class="site-subtitle">
-        市内のボランティア情報を、1つのページでチェックできます。
+        市内のボランティア募集情報を、役割ごとに確認・管理できます。
       </p>
     </div>
   </header>
 
-  <main class="site-main">
-    <!-- お知らせ / 使い方 -->
-    <section class="section">
-      <h2 class="section-title">このページについて</h2>
-      <p class="section-text">
-        このページは、Googleスプレッドシートに登録した
-        「中学生ボランティア募集情報」を自動で読み込んで一覧表示します。<br />
-        スプレッドシートを更新すると、ページの表示も自動で更新されます。
-      </p>
-      <details class="section-details">
-        <summary>スプレッドシートの列名ルール（管理者向け）</summary>
-        <ul>
-          <li><code>title</code> … イベント名</li>
-          <li><code>date</code> … 日付（例：2025-11-23 や 11/23（日））</li>
-          <li><code>time</code> … 時間（例：9:00〜12:00）</li>
-          <li><code>place</code> … 場所</li>
-          <li><code>target</code> … 対象（例：中1〜中3）</li>
-          <li><code>category</code> … 分野（例：子ども・環境・イベント など）</li>
-          <li><code>capacity</code> … 定員（例：20人・先着順 など）</li>
-          <li><code>deadline</code> … 申込締切</li>
-          <li><code>description</code> … 内容（簡単な説明）</li>
-          <li><code>apply_url</code> … 申込フォームURL（Googleフォームなど）</li>
-        </ul>
-      </details>
-    </section>
+  <!-- 役割タブ -->
+  <nav class="role-tabs">
+    <button class="role-tab active" data-target="studentSection">中学生用</button>
+    <button class="role-tab" data-target="teacherSection">先生用</button>
+    <button class="role-tab" data-target="organizerSection">主催団体用</button>
+  </nav>
 
-    <!-- 絞り込みエリア -->
-    <section class="section">
-      <h2 class="section-title">ボランティアを探す</h2>
+  <main class="site-main">
+
+    <!-- ① 中学生ボランティア用画面 -->
+    <section id="studentSection" class="section">
+      <h2 class="section-title">中学生向けボランティア一覧</h2>
+      <p class="section-text">
+        参加してみたいボランティアをえらんで、内容をよく読んでから申し込みましょう。
+      </p>
 
       <div class="filters">
         <div class="filter-item">
-          <label for="searchInput">キーワード検索</label>
+          <label for="studentSearchInput">キーワード検索</label>
           <input
-            id="searchInput"
+            id="studentSearchInput"
             type="search"
             placeholder="例：子ども・環境・祭り など"
           />
         </div>
 
         <div class="filter-item">
-          <label for="categorySelect">分野でえらぶ</label>
-          <select id="categorySelect">
+          <label for="studentCategorySelect">分野でえらぶ</label>
+          <select id="studentCategorySelect">
             <option value="">すべての分野</option>
-            <!-- JSでカテゴリを追加 -->
           </select>
         </div>
 
         <div class="filter-item">
-          <label for="dateSelect">日にちでえらぶ</label>
-          <select id="dateSelect">
+          <label for="studentDateSelect">日にちでえらぶ</label>
+          <select id="studentDateSelect">
             <option value="">すべての日にち</option>
-            <!-- JSで日付を追加 -->
           </select>
+        </div>
+      </div>
+
+      <div id="studentStatusMessage" class="status-message">
+        データを読み込み中です…
+      </div>
+
+      <div id="studentCardsContainer" class="cards-container">
+        <!-- JSでカードを追加 -->
+      </div>
+    </section>
+
+    <!-- ② 先生用管理画面 -->
+    <section id="teacherSection" class="section hidden">
+      <h2 class="section-title">先生用管理画面</h2>
+      <p class="section-text">
+        中学生ボランティアクラブの先生向けの画面です。<br />
+        ログインすると、イベント一覧や応募状況を確認できます。
+      </p>
+
+      <!-- ログイン前 -->
+      <div id="teacherLoginBox" class="login-box">
+        <h3>先生ログイン</h3>
+        <p class="login-note">※ デモ用に簡易パスワード方式です。実運用では別途ご検討ください。</p>
+        <div class="login-field">
+          <label for="teacherPassword">パスワード</label>
+          <input id="teacherPassword" type="password" />
+        </div>
+        <button id="teacherLoginButton" class="primary-button">ログイン</button>
+        <div id="teacherLoginError" class="login-error"></div>
+      </div>
+
+      <!-- ログイン後 -->
+      <div id="teacherPanel" class="hidden">
+        <p class="section-text">
+          イベントの一覧と、応募状況の一覧を確認できます。
+        </p>
+
+        <h3 class="subsection-title">イベント一覧（先生用ビュー）</h3>
+        <div class="filters">
+          <div class="filter-item">
+            <label for="teacherCategorySelect">分野でえらぶ</label>
+            <select id="teacherCategorySelect">
+              <option value="">すべての分野</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label for="teacherDateSelect">日にちでえらぶ</label>
+            <select id="teacherDateSelect">
+              <option value="">すべての日にち</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="teacherStatusMessage" class="status-message">
+          データを読み込み中です…
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="teacherEventsTable">
+            <thead>
+              <tr>
+                <th>イベント名</th>
+                <th>日時</th>
+                <th>場所</th>
+                <th>対象</th>
+                <th>分野</th>
+                <th>締切</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- JSで行を追加 -->
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subsection-title">応募状況一覧</h3>
+        <p class="section-text">
+          応募用フォームから送信された内容を、スプレッドシートの「応募一覧」シート経由で読み込みます。
+        </p>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="applicationsTable">
+            <thead>
+              <tr>
+                <th>イベント名</th>
+                <th>名前</th>
+                <th>学校</th>
+                <th>学年</th>
+                <th>クラス</th>
+                <th>ステータス</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- JSで行を追加 -->
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
 
-    <!-- 一覧表示エリア -->
-    <section class="section">
-      <h2 class="section-title">募集一覧</h2>
+    <!-- ③ 主催団体用画面 -->
+    <section id="organizerSection" class="section hidden">
+      <h2 class="section-title">主催団体用画面</h2>
+      <p class="section-text">
+        イベント主催団体の方向けの画面です。<br />
+        ログインすると、ボランティア募集の新規登録フォームが表示されます。
+      </p>
 
-      <div id="statusMessage" class="status-message">
-        データを読み込み中です…
+      <!-- ログイン前 -->
+      <div id="organizerLoginBox" class="login-box">
+        <h3>主催者ログイン</h3>
+        <p class="login-note">※ デモ用の簡易パスワードです。本格運用時は別途の仕組みをご検討ください。</p>
+        <div class="login-field">
+          <label for="organizerPassword">パスワード</label>
+          <input id="organizerPassword" type="password" />
+        </div>
+        <button id="organizerLoginButton" class="primary-button">ログイン</button>
+        <div id="organizerLoginError" class="login-error"></div>
       </div>
 
-      <div id="cardsContainer" class="cards-container">
-        <!-- JSでカードを追加 -->
+      <!-- ログイン後 -->
+      <div id="organizerPanel" class="hidden">
+        <p class="section-text">
+          下のフォームに入力すると、「スプレッドシートに登録するための内容」が生成されます。<br />
+          現在のサンプルでは、実際の登録は
+          <strong>GoogleフォームやApps Script</strong>と接続して行う想定です。
+        </p>
+
+        <form id="organizerEventForm" class="event-form">
+          <div class="form-row">
+            <label for="orgTitle">イベント名</label>
+            <input id="orgTitle" type="text" required />
+          </div>
+          <div class="form-row">
+            <label for="orgDate">日付</label>
+            <input id="orgDate" type="text" placeholder="例：2025-11-23" required />
+          </div>
+          <div class="form-row">
+            <label for="orgTime">時間</label>
+            <input id="orgTime" type="text" placeholder="例：9:00〜12:00" />
+          </div>
+          <div class="form-row">
+            <label for="orgPlace">場所</label>
+            <input id="orgPlace" type="text" required />
+          </div>
+          <div class="form-row">
+            <label for="orgTarget">対象</label>
+            <input id="orgTarget" type="text" placeholder="例：中1〜中3" />
+          </div>
+          <div class="form-row">
+            <label for="orgCategory">分野</label>
+            <input id="orgCategory" type="text" placeholder="例：子ども・環境・祭り など" />
+          </div>
+          <div class="form-row">
+            <label for="orgCapacity">定員</label>
+            <input id="orgCapacity" type="text" placeholder="例：20人・先着順" />
+          </div>
+          <div class="form-row">
+            <label for="orgDeadline">申込締切</label>
+            <input id="orgDeadline" type="text" placeholder="例：2025-11-10" />
+          </div>
+          <div class="form-row">
+            <label for="orgDescription">内容（簡単な説明）</label>
+            <textarea id="orgDescription" rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <label for="orgApplyUrl">申込フォームURL</label>
+            <input id="orgApplyUrl" type="url" placeholder="Googleフォームなど" />
+          </div>
+
+          <button type="submit" class="primary-button">登録内容を確認</button>
+        </form>
+
+        <div id="organizerPreview" class="organizer-preview hidden">
+          <h3 class="subsection-title">スプレッドシート登録イメージ</h3>
+          <p class="section-text">
+            下記のような1行を、スプレッドシート「イベント一覧」のシートに追加してください。<br />
+            （Apps ScriptやGoogleフォームと連携すれば、自動登録も可能です）
+          </p>
+          <pre id="organizerPreviewJson" class="preview-json"></pre>
+        </div>
       </div>
     </section>
+
   </main>
 
   <footer class="site-footer">
-    <small>© 中学生ボランティア募集アプリ</small>
+    <small>© 中学生ボランティア募集アプリ（サンプル）</small>
   </footer>
 
-  <!-- メインJS -->
   <script src="./main.js"></script>
 </body>
 </html>

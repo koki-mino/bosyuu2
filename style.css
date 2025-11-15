@@ -1,5 +1,4 @@
-/* --------- 全体レイアウト --------- */
-
+/* 共通リセット */
 *,
 *::before,
 *::after {
@@ -16,6 +15,7 @@ body {
   background-color: #f1f5f9;
 }
 
+/* ヘッダー */
 .site-header {
   background: linear-gradient(135deg, #2563eb, #38bdf8);
   color: #fff;
@@ -39,19 +39,46 @@ body {
   opacity: 0.95;
 }
 
+/* メイン */
 .site-main {
   max-width: 960px;
   margin: 1.25rem auto 2.5rem;
   padding: 0 1rem;
 }
 
-/* --------- セクション --------- */
+/* 役割タブ */
+.role-tabs {
+  max-width: 960px;
+  margin: 0.5rem auto 0;
+  padding: 0 1rem 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
 
+.role-tab {
+  flex: 1;
+  border-radius: 9999px;
+  border: 1px solid #d1d5db;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  background-color: #e5e7eb;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.role-tab.active {
+  background-color: #111827;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+}
+
+/* セクション共通 */
 .section {
   background-color: #ffffff;
   border-radius: 0.75rem;
   padding: 1.25rem 1rem;
-  margin-bottom: 1rem;
+  margin-top: 0.75rem;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
@@ -62,45 +89,26 @@ body {
   color: #0f172a;
 }
 
+.subsection-title {
+  margin: 1.2rem 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+}
+
 .section-text {
-  margin: 0;
+  margin: 0 0 0.75rem;
   font-size: 0.9rem;
   line-height: 1.7;
   color: #4b5563;
 }
 
-/* details（使い方） */
-
-.section-details {
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-}
-
-.section-details summary {
-  cursor: pointer;
-  color: #2563eb;
-  font-weight: 500;
-}
-
-.section-details ul {
-  margin-top: 0.5rem;
-  padding-left: 1.25rem;
-  color: #4b5563;
-}
-
-.section-details code {
-  background-color: #e5e7eb;
-  border-radius: 0.25rem;
-  padding: 0.1rem 0.3rem;
-  font-size: 0.8rem;
-}
-
-/* --------- フィルターUI --------- */
-
+/* フィルターUI */
 .filters {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 @media (min-width: 640px) {
@@ -140,16 +148,14 @@ body {
   background-color: #ffffff;
 }
 
-/* --------- ステータス表示 --------- */
-
+/* ステータスメッセージ */
 .status-message {
   font-size: 0.9rem;
   color: #6b7280;
-  margin-bottom: 0.75rem;
+  margin: 0.75rem 0;
 }
 
-/* --------- カード一覧 --------- */
-
+/* カード一覧（中学生用） */
 .cards-container {
   display: grid;
   grid-template-columns: 1fr;
@@ -259,11 +265,165 @@ body {
   opacity: 0.95;
 }
 
-/* --------- フッター --------- */
+/* ログインボックス */
+.login-box {
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.9rem;
+  background-color: #f9fafb;
+}
 
+.login-box h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.login-note {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.login-field label {
+  font-weight: 600;
+}
+
+.login-field input {
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.login-error {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: #b91c1c;
+}
+
+/* ボタン共通 */
+.primary-button {
+  border-radius: 9999px;
+  border: none;
+  padding: 0.45rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+  opacity: 0.97;
+}
+
+/* 先生用テーブル */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.data-table thead {
+  background-color: #e5e7eb;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background-color: #f3f4f6;
+}
+
+/* 主催者用フォーム */
+.event-form {
+  margin-top: 0.75rem;
+  padding: 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.7rem;
+  font-size: 0.85rem;
+}
+
+.form-row label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-row input,
+.form-row textarea {
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.9rem;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.form-row textarea {
+  resize: vertical;
+}
+
+/* 主催者プレビュー */
+.organizer-preview {
+  margin-top: 1rem;
+  padding: 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #fefce8;
+}
+
+.preview-json {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  background-color: #111827;
+  color: #e5e7eb;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+/* フッター */
 .site-footer {
   text-align: center;
   padding: 1.5rem 1rem 2rem;
   font-size: 0.75rem;
   color: #9ca3af;
+}
+
+/* 汎用 */
+.hidden {
+  display: none !important;
 }
